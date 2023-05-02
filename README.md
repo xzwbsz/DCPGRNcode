@@ -8,6 +8,7 @@ torch>=1.7.0
 torch-geometric-temporal
 
 Dependency can be installed using the following command:
+
 pip install -r requirements.txt
 
 ## Training the Model
