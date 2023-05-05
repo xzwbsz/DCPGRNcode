@@ -2,6 +2,8 @@
 Dynamic Climate Pattern Graph Recurrent Network (DCPGRN) for meteorological forecasting
 
 This is a Official PyTorch implementation of DCPGRN
+![image](https://user-images.githubusercontent.com/44642002/236467011-f7a01b7b-6c87-4f50-be93-a6240eb3c2a7.png)
+
 
 ## Basic Requirements
 torch>=1.7.0
