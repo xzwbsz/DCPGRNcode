@@ -4,7 +4,7 @@ import shutil
 import sys
 import time
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 proj_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(proj_dir) # 将路径添加到环境目录 Add the path to the environment directory
 from utils import config, file_dir
