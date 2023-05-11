@@ -1,17 +1,11 @@
 ---
 experiments:
-#  metero_use: ['d2m',
-#               't2m',
-#               'skt',
-#               'stl1',
-#               'sp',
-#               'tp',]
-  metero_use: ['q',
+  metero_use: ['t2m',
                'crwc',
                't',
                'u',
                'v',]
-  pred_var: ['q']
+  pred_var: ['t']
   save_npy: True
   dataset_num: 1
   # model: LS_GNN
@@ -20,12 +14,9 @@ experiments:
 train:
   epochs: 50
   exp_repeat: 10
-#  batch_size: 56
-#  hist_len: 5
-#  pred_len: 5
-  batch_size: 4
-  hist_len: 96
-  pred_len: 104
+  batch_size: 50
+  hist_len: 24
+  pred_len: 24
   weight_decay: 0.0005
   early_stop: 10
   lr: 0.0005
@@ -35,18 +26,7 @@ train:
   batch_epoch: 3
 
 filepath:
-  b216:
-    dataset1_fp: /climatedata/data2/autumn_data_2016_2022/20* # /climatedata/haojy/ls-gnn/data/dataset1.nc
-    results_dir: /climatedata/haojy/result/result_dataset2  # /climatedata/haojy/ls-gnn/result/result_dataset1
-  p40:
-    dataset1_fp: /data/haojy/2022/* # /home/xuzhewen/data2/climate_spring.grib
-    results_dir: /home/xuzhewen/haojy/Forcast6_8/result/result_dataset1
-  p40gnn:
-    dataset1_fp: /public/climatedata-1000hpa/2016/* # /home/xuzhewen/data2/climate_spring.grib
-    results_dir: /home/gnn/ForcastResult/result_dataset1
-  p40gnn2:
-    dataset1_fp: /public/climatedata-1000hpa/2016/* # /home/xuzhewen/data2/climate_spring.grib
-    results_dir: /home/gnn/ForcastResult/result_dataset1
+  #Your machine name: filepath
 
 
 data:
@@ -101,7 +81,7 @@ idgl:
   feat_adj_dropout: 0.5 # 0.5
   gl_dropout: 0.8
   print_every_epochs: 500 # Print every X epochs
-  max_iter: 15 # gl最大轮次
+  max_iter: 15 # gl max epoches
   smoothness_ratio: 0.2
   degree_ratio: 0
   sparsity_ratio: 0
@@ -114,7 +94,7 @@ agcrn:
   embed_dim: 10
   rnn_units: 64
   num_layers: 2
-  cheb_order: 2 # 切比雪夫项数
+  cheb_order: 2 # 切比雪夫项数 Chebyshev term number
   node_num: 142
 
 dcrnn:
