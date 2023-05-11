@@ -16,7 +16,7 @@ import shutil
 import os
 import sys
 proj_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(proj_dir) # 将路径添加到环境目录
+sys.path.append(proj_dir) # 将路径添加到环境目录 Add the path to the environment directory
 from idgl_utils.idgl_utils import AverageMeter
 from model.model_idgl import IDGL
 
@@ -24,13 +24,13 @@ class ModelHandler(object):
     def __init__(self,config,train_loader,val_loader,test_loader,adj0,dist):
         self.config = config
         """
-            1 创建评价指标 并指定数据结构
+            1 创建评价指标 并指定数据结构 Create metrics and specify data structures
         """
-        # 训练集损失 验证集损失 测试集损失 均方根误差列表
+        # 训练集损失 train loss 验证集损失 val loss 测试集损失 test loss 均方根误差列表 list of RMSE
         self.train_loss_list, self.val_loss_list, self.test_loss_list, self.rmse_list = [], [], [], []
 
         """
-            2 确定运行设备
+            2 确定运行设备 Determine operating facility
         """
         use_cuda = torch.cuda.is_available()
         # if use_cuda:
@@ -41,7 +41,7 @@ class ModelHandler(object):
         self.config['device'] = self.device
 
         """
-            3 设置随机种子应用到设备
+            3 设置随机种子应用到设备 Set random seeds to be applied to the device
         """
         seed = self.config['idgl'].get('seed',42)
         np.random.seed(seed)
@@ -50,7 +50,7 @@ class ModelHandler(object):
             torch.cuda.manual_seed(seed)
 
         """
-            4 准备数据集
+            4 准备数据集 Prepare the datasets
         """
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -59,7 +59,7 @@ class ModelHandler(object):
         self.dist = dist
         np.save("result/adj0.npy",self.adj0.cpu().detach().numpy())
         """
-            5 model初始化并打印模型信息和参数总数
+            5 model初始化并打印模型信息和参数总数 model initializes and prints model information and parameter totals
         """
         self.model = IDGL(config)
         self.model = self.model.to(self.device)
@@ -75,12 +75,12 @@ class ModelHandler(object):
         # print('#Parameters = {}\n'.format(num_params))
 
         """
-            6 确定使用哪种优化器 定义计算RMSE函数
+            6 确定使用哪种优化器 Determine which optimizer to use 定义计算RMSE函数 Define to compute the RMSE function
         """
         self.init_optimizer()
         self.criterion = nn.MSELoss()
 
-    # 初始化优化器
+    # 初始化优化器 Initialize the optimizer
     def init_optimizer(self):
         parameters = [p for p in self.model.parameters() if p.requires_grad]
         if self.config['train']['optimizer'] == 'sgd':
@@ -101,7 +101,7 @@ class ModelHandler(object):
         #                                    patience=self.config['train']['lr_patience'], verbose=True) # 动态调整学习率
 
 
-    # 训练过程
+    # 训练过程 training process
     def train(self,epoch):
         if self.train_loader is None:
             print("No training set specified -- skipped training")
@@ -114,7 +114,7 @@ class ModelHandler(object):
         return train_loss
 
 
-    # 验证过程
+    # 验证过程 validation
     def val(self):
         if self.val_loader is None:
             print("No val set specified -- skipped training")
@@ -125,7 +125,7 @@ class ModelHandler(object):
 
         return val_loss
 
-    # 测试过程
+    # 测试过程 test
     def test(self,t2m_mean,t2m_std):
 
         self.t2m_mean = t2m_mean
@@ -162,7 +162,7 @@ class ModelHandler(object):
         is_mean_curA = True
         pth_idx_str = "./save_train_param/Param"
 
-        # 每个batch分别做训练
+        # 每个batch分别做训练 Each batch is trained separately
         for batch_idx,data in enumerate(data_loader):
             self.optimizer.zero_grad()  # 梯度置0
             feature,t2m,timestamp_arr = data
@@ -177,7 +177,7 @@ class ModelHandler(object):
             max_iter = self.config['idgl'].get('max_iter', 10)
             self.adj0 = self.adj0.to(self.device)
 
-            # 重新初始化模型并进行读取数值
+            # 重新初始化模型并进行读取数值 Reinitialize the model and read the values
             if load_modelParam:
                 modelA = IDGL(self.config)
                 self.model = modelA.to(self.device)
@@ -190,9 +190,9 @@ class ModelHandler(object):
                     node_vec = self.node_vec1
 
 
-            """ 是否进行图学习 """
+            """ 是否进行图学习 Whether to perform graph learning """
             if self.config['idgl']['graph_learn'] :
-                # 第一轮使用初始特征 后期使用GCN的Embedding
+                # 第一轮使用初始特征 后期使用GCN的Embedding The first round uses the initial feature and later uses GCN's Embedding
                 node_vec = slideWindow_first_day_feature if batch_idx == 0 else node_vec
 
                 # 判断本轮是否进行图学习
@@ -214,12 +214,12 @@ class ModelHandler(object):
                         save_adj_new = "result/epoch=" + str(self.epoch_num) + "_adj1.npy"
                         np.save(save_adj_new, cur_ad.cpu().detach().numpy())
 
-                else: # 不进行图学习时
+                else: # 不进行图学习时 Without graph learning
                     is_mean_curA = False
                     graphLoss_update_continue = False # 是否还继续更新graphLoss
                     cur_adj = self.cur_adj1
 
-            else: #  不进行图学习则采用原始图计算
+            else: #  不进行图学习则采用原始图计算 If without graph learning, original graph calculation is used
                 cur_adj = self.adj0
                 graphLoss_update_continue = False
 
@@ -238,7 +238,7 @@ class ModelHandler(object):
                 graph_loss_feature = slideWindow_first_day_feature.mean(0)
                 loss = loss + self.add_graph_loss(graph_loss_adj, graph_loss_feature)
 
-            # 每轮都进行存储
+            # 每轮都进行存储 Each round the intermediate results are stored
             if task_type == "train":
 
                 if self.config['idgl']['graph_learn']:
@@ -266,9 +266,9 @@ class ModelHandler(object):
                 self.label_list.append(t2m_label_val)
                 self.time_list.append(timestamp_arr.cpu().detach().numpy())
 
-        # 复制最后模型参数为Param0.pth
+        # 复制最后模型参数为Param0.pth The last parameter is stored as Param0.pth
         if task_type == "train":
-            # 绘邻接矩阵热点图
+            # 绘邻接矩阵热点图 plot the adjacency matrix hotspot map
             if self.config['idgl']['graph_learn']:
                 print('start imaging')
             else :
@@ -277,7 +277,7 @@ class ModelHandler(object):
                 save_adj_new = "result/epoch=" + str(self.epoch_num) + "_adj.npy"
                 np.save(save_adj_new, cur_add.cpu().detach().numpy())
 
-            # 存储参数
+            # 存储参数 Store the parameters
             pth_new = "./save_train_param/Param0.pth"
             shutil.copyfile(pth_idx_str,pth_new)
 
@@ -302,7 +302,7 @@ class ModelHandler(object):
 
 
     def add_graph_loss(self, out_adj, features):  # 输入 A(t) 和 features:X
-        # Graph regularization
+        # 图正则化 Graph regularization
         graph_loss = 0
         L = torch.diagflat(torch.sum(out_adj, -1, keepdim=True)) - out_adj  # (2708,2708) diagflat对角扩展 L = D-A
         graph_loss += self.config['idgl']['smoothness_ratio'] * torch.trace(torch.mm(features.transpose(-1, -2), torch.mm(L, features))) / int(np.prod(out_adj.shape))  # Ω(A,X) = 1/n^2 tr(X^T L X) 最小化平滑损失 | tr() 表示对角线元素总和
