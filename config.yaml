@@ -99,7 +99,7 @@ idgl:
   verbose: 20
   dropout: 0.5
   feat_adj_dropout: 0.5 # 0.5
-  gl_dropout: 0.5
+  gl_dropout: 0.8
   print_every_epochs: 500 # Print every X epochs
   max_iter: 15 # gl最大轮次
   smoothness_ratio: 0.2
