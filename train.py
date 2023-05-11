@@ -34,7 +34,7 @@ device = torch.device('cuda' if use_cuda else 'cpu')
 
 # 实例化图类 Instantiate the graph class
 graph = Graph()
-station_num = graph.node_num # 节点数
+station_num = graph.node_num # 节点数 Number of nodes
 station_node = graph.nodes # 字典 idx:{station_name,lon,lat,altitude}
 config['station_num'] = station_num
 config['edge_index'] = graph.edge_index
@@ -82,20 +82,20 @@ node_attr = np.concatenate((var_pred,var_feature1,var_feature2),axis=-1)
 """通过untils中的函数读取config文件 并获取相应的参数 Read the config file and get the parameters from the function untils"""
 batch_size = config['train']['batch_size'] # 32
 epochs = config['train']['epochs'] # 50
-hist_len = config['train']['hist_len'] # 1 # 隐藏层大小
-pred_len = config['train']['pred_len'] # 24 预测天数
-weight_decay = config['train']['weight_decay'] # 0.0005 L2正则化的目的就是为了让权重衰减到更小的值，在一定程度上减少模型过拟合的问题，所以权重衰减也叫L2正则化。
-early_stop = config['train']['early_stop'] # 10 当early stop被激活(如发现loss相比上一个epoch训练没有下降)，则经过10(此处为10)个epoch后停止训练
-lr = config['train']['lr'] # 0.0005 学习率
+hist_len = config['train']['hist_len'] # 1 
+pred_len = config['train']['pred_len'] # 24
+weight_decay = config['train']['weight_decay'] # 0.0005 L2正则化 L2 regularization
+early_stop = config['train']['early_stop'] # 10 
+lr = config['train']['lr'] # 0.0005 学习率 learning rate
 results_dir = file_dir['results_dir'] # util下的file_dir下的results_dir路径
 dataset_num = config['experiments']['dataset_num'] # 1 采用数据集配置1
-exp_model = config['experiments']['model'] # 根据model选择 LS_GNN
-exp_repeat = config['train']['exp_repeat'] # 10次实验 减少实验误差
-save_npy = config['experiments']['save_npy'] # True 是否保存模型为.npy文件
-seed = config['idgl']['seed'] # 420
+exp_model = config['experiments']['model'] # 根据model选择 Ablation experiment
+exp_repeat = config['train']['exp_repeat'] # 10次实验 减少实验误差 10 experiments to reduce experimental error
+save_npy = config['experiments']['save_npy'] # True 是否保存模型为.npy文件 Whether to save the model as a.npy file
+seed = config['idgl']['seed'] # random seed
 idgl_hid_len = config['idgl']['hidden_size']
 graph_learn = config['idgl']['graph_learn']
-criterion = nn.MSELoss() # 定义MSE为loss
+criterion = nn.MSELoss() # 定义MSE为loss （MSE is defined as loss
 
 """实例化dataset.py文件对数据进行所需要的处理 Instantiate the dataset.py file to process the data as required"""
 train_data = HaveData(graph, node_attr, timestamp, hist_len, pred_len, dataset_num, flag='Train')
