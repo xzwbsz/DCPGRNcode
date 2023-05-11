@@ -6,7 +6,7 @@ import time
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 proj_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(proj_dir) # 将路径添加到环境目录
+sys.path.append(proj_dir) # 将路径添加到环境目录 Add the path to the environment directory
 from utils import config, file_dir
 from graph import Graph
 from dataset import HaveData
@@ -26,13 +26,13 @@ import numpy as np
 import glob
 import psutil
 
-# 设置运行设备
+# 设置运行设备 Set up running facility
 torch.set_num_threads(1)
 use_cuda = torch.cuda.is_available()
 device = torch.device('cuda' if use_cuda else 'cpu')
 # device = torch.device('cpu')
 
-# 实例化 图类
+# 实例化图类 Instantiate the graph class
 graph = Graph()
 station_num = graph.node_num # 节点数
 station_node = graph.nodes # 字典 idx:{station_name,lon,lat,altitude}
@@ -43,7 +43,7 @@ adj0 = graph.adj
 dist = graph.dist
 lonlat = graph.lonlat
 
-"""nc文件预处理/读取npy"""
+"""nc文件预处理/读取npy //nc file preprocessing/reading npy"""
 if os.path.exists('data/feature_2160nodes.npy') and os.path.exists('data/time_2160nodes.npy'):
     print("Dataset use save_npy")
     node_attr = np.load('data/feature_2160nodes.npy')
@@ -63,7 +63,7 @@ else:
     node_attr = np.load('data/feature_2160nodes.npy') # get type:ndarray | var_name:node_attr | shape:(node_num,time_num,attr_num)
     timestamp = np.load('data/time_2160nodes.npy') # get type:ndarray | var_name:timestamp | shape:(time_num,)
 
-"""更改变量维度次序 确保要预测的变量在第一维"""
+"""更改变量维度次序 确保要预测的变量在第一维 Change the variable dimension order to ensure that the variable you want to predict is in the first dimension"""
 use_var_list = config['experiments']['metero_use']
 pred_var_name = config['experiments']['pred_var']
 use_var_num = config['idgl']['hidden_size']
@@ -79,7 +79,7 @@ var_feature2 = node_attr[:,:,pred_var_site+1:]
 node_attr = np.concatenate((var_pred,var_feature1,var_feature2),axis=-1)
 
 
-"""通过untils中的函数读取config文件 并获取相应的参数"""
+"""通过untils中的函数读取config文件 并获取相应的参数 Read the config file and get the parameters from the function untils"""
 batch_size = config['train']['batch_size'] # 32
 epochs = config['train']['epochs'] # 50
 hist_len = config['train']['hist_len'] # 1 # 隐藏层大小
@@ -97,7 +97,7 @@ idgl_hid_len = config['idgl']['hidden_size']
 graph_learn = config['idgl']['graph_learn']
 criterion = nn.MSELoss() # 定义MSE为loss
 
-"""实例化dataset.py文件对数据进行所需要的处理"""
+"""实例化dataset.py文件对数据进行所需要的处理 Instantiate the dataset.py file to process the data as required"""
 train_data = HaveData(graph, node_attr, timestamp, hist_len, pred_len, dataset_num, flag='Train')
 val_data = HaveData(graph, node_attr, timestamp, hist_len, pred_len, dataset_num, flag='Val')
 test_data = HaveData(graph, node_attr, timestamp, hist_len, pred_len, dataset_num, flag='Test')
@@ -157,7 +157,7 @@ def main():
         exp_info = get_exp_info()
         exp_time = arrow.now().format('YYYYMMDDHHmmss')
 
-        # 调用DataLoader 返回dataset.py的__getitem__函数值 ()
+        # 调用DataLoader 返回dataset.py的__getitem__函数值 ()  Calling DataLoader returns the __getitem__ function value of dataset.py
         train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
         val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle=False, drop_last=True)
         test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=False, drop_last=True)
@@ -235,7 +235,7 @@ def main():
                 rmse, mae = get_metric(predict_epoch_, label_epoch_)
                 print('Train loss: %0.4f, Val loss: %0.4f, Test loss: %0.4f, RMSE: %0.8f , MAE:%0.8f' % (train_loss_, val_loss_, test_loss_, rmse, mae))
 
-                """加入NMSE"""
+                """加入NMSE Add the NMSE"""
                 nmse = rmse/t2m_std
                 print('NMSE:',nmse[0])
 
