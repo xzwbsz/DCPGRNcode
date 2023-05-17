@@ -98,54 +98,54 @@ class LS_GNN(nn.Module):
         hn = h0
         edge_src_target,edge_weight = dense_to_sparse(cur_adj)
 
-#         for i in range(self.pred_len): # Encoder with GRU
-#             if i == 0 :
-#                 x = node_vec
-#             else:
-#                 x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,1+2)
-
-#             xn_gnn = x # (batch_size,2160,3)
-#             xn_gnn = xn_gnn.contiguous() # (batch_size,station_num,3)
-#             xn_gnn = self.graph_gnn(xn_gnn,edge_src_target,edge_weight) # 调用GraphGNN()的 (batch_size,station_num,3) -> (batch_size,station_num,13)
-#             x = torch.cat([xn_gnn, x], dim=-1)  # (batch_size,station_num,13+3) -> (batch_size,station_num,16)
-
-#             hn = self.gru_cell(x, hn) # 调用GRU层的forward  Call the forward of the GRU layer (batch_size*station_num , his_dim) 
-#             xn = hn.view(self.batch_size, self.station_num, self.hid_dim) # view(x1,x2,x3)调整维度为(batch_size*station_num , hid_dim)->(batch_size , station_num , hid_dim)
-#             xn = self.fc_out(xn) # 调用Linear层 (batch_size,station_num,64) -> (batch_size,station_num,1)
-#             t2m_pred.append(xn) # 每次增加(batch_size,station_num,1)
-
-        for i in range(self.hist_len): # encoder
+        for i in range(self.pred_len): # Encoder with GRU
             if i == 0 :
                 x = node_vec
             else:
                 x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,1+2)
-            encoder_dim = x.shape[-1]
+
             xn_gnn = x # (batch_size,2160,3)
             xn_gnn = xn_gnn.contiguous() # (batch_size,station_num,3)
             xn_gnn = self.graph_gnn(xn_gnn,edge_src_target,edge_weight) # 调用GraphGNN()的 (batch_size,station_num,3) -> (batch_size,station_num,13)
             x = torch.cat([xn_gnn, x], dim=-1)  # (batch_size,station_num,13+3) -> (batch_size,station_num,16)
-            hn = self.gru_cell(x, hn) # 调用GRU层的forward进行encoder (batch_size*station_num , his_dim)
-            xn = hn.view(self.batch_size, self.station_num, self.hid_dim) # view(x1,x2,x3)调整维度为(batch_size*station_num , hid_dim)->(batch_size , station_num , hid_dim)
-            if i==self.hist_len-1:  #encoder output
-                xn = self.fc_out_encoder(xn) # 调用Linear层 (batch_size,station_num,64) -> (batch_size,station_num,1)
-            else: #hidden layer dim
-                xn = self.fc_out(xn)
-            # t2m_pred.append(xn) # 每次增加(batch_size,station_num,1)
 
-        for i in range(self.pred_len): # decoder
-            # x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,encoder_dim)
-            if i == 0 :
-                x = xn
-            else:
-                x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,1+2)
-            xn_gnn = x # (batch_size,2160,3)
-            xn_gnn = xn_gnn.contiguous() # (batch_size,station_num,3)
-            xn_gnn = self.graph_gnn(xn_gnn,edge_src_target,edge_weight) # 调用GraphGNN()的 (batch_size,station_num,3) -> (batch_size,station_num,13)
-            x = torch.cat([xn_gnn, x], dim=-1)
-            hn = self.gru_cell(x, hn) # 调用GRU层的forward进行decoder (batch_size*station_num , his_dim)
+            hn = self.gru_cell(x, hn) # 调用GRU层的forward  Call the forward of the GRU layer (batch_size*station_num , his_dim) 
             xn = hn.view(self.batch_size, self.station_num, self.hid_dim) # view(x1,x2,x3)调整维度为(batch_size*station_num , hid_dim)->(batch_size , station_num , hid_dim)
             xn = self.fc_out(xn) # 调用Linear层 (batch_size,station_num,64) -> (batch_size,station_num,1)
             t2m_pred.append(xn) # 每次增加(batch_size,station_num,1)
+
+#         for i in range(self.hist_len): # encoder
+#             if i == 0 :
+#                 x = node_vec
+#             else:
+#                 x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,1+2)
+#             encoder_dim = x.shape[-1]
+#             xn_gnn = x # (batch_size,2160,3)
+#             xn_gnn = xn_gnn.contiguous() # (batch_size,station_num,3)
+#             xn_gnn = self.graph_gnn(xn_gnn,edge_src_target,edge_weight) # 调用GraphGNN()的 (batch_size,station_num,3) -> (batch_size,station_num,13)
+#             x = torch.cat([xn_gnn, x], dim=-1)  # (batch_size,station_num,13+3) -> (batch_size,station_num,16)
+#             hn = self.gru_cell(x, hn) # 调用GRU层的forward进行encoder (batch_size*station_num , his_dim)
+#             xn = hn.view(self.batch_size, self.station_num, self.hid_dim) # view(x1,x2,x3)调整维度为(batch_size*station_num , hid_dim)->(batch_size , station_num , hid_dim)
+#             if i==self.hist_len-1:  #encoder output
+#                 xn = self.fc_out_encoder(xn) # 调用Linear层 (batch_size,station_num,64) -> (batch_size,station_num,1)
+#             else: #hidden layer dim
+#                 xn = self.fc_out(xn)
+#             # t2m_pred.append(xn) # 每次增加(batch_size,station_num,1)
+
+#         for i in range(self.pred_len): # decoder
+#             # x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,encoder_dim)
+#             if i == 0 :
+#                 x = xn
+#             else:
+#                 x = torch.cat((xn, feature[:, self.hist_len + i]), dim=-1) # 对最后一维进行cat拼接操作 (batch_size,station_num,1+2)
+#             xn_gnn = x # (batch_size,2160,3)
+#             xn_gnn = xn_gnn.contiguous() # (batch_size,station_num,3)
+#             xn_gnn = self.graph_gnn(xn_gnn,edge_src_target,edge_weight) # 调用GraphGNN()的 (batch_size,station_num,3) -> (batch_size,station_num,13)
+#             x = torch.cat([xn_gnn, x], dim=-1)
+#             hn = self.gru_cell(x, hn) # 调用GRU层的forward进行decoder (batch_size*station_num , his_dim)
+#             xn = hn.view(self.batch_size, self.station_num, self.hid_dim) # view(x1,x2,x3)调整维度为(batch_size*station_num , hid_dim)->(batch_size , station_num , hid_dim)
+#             xn = self.fc_out(xn) # 调用Linear层 (batch_size,station_num,64) -> (batch_size,station_num,1)
+#             t2m_pred.append(xn) # 每次增加(batch_size,station_num,1)
             
         t2m_pred = torch.stack(t2m_pred, dim=1) # (batch_size,pred_len,station_num,1)
 
