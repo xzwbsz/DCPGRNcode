@@ -229,7 +229,7 @@ class ModelHandler(object):
             if self.config['idgl']['graph_learn'] and is_mean_curA:
                 cur_adj = cur_adj.mean(0)
 
-            t2m_pred = self.model.encoder.graph_encoders[-1](node_vec,cur_adj,feature)  # GCN layer2 : output=MP(A(1)_hat,MP(Z(1),W2))
+            t2m_pred = self.model.encoder.graph_encoders[-1](node_vec,cur_adj,feature)  #also contains decoder with GRU in LS_GNN
 
             loss = loss + self.criterion(t2m_pred, t2m_label)
 
