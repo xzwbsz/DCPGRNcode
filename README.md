@@ -34,7 +34,8 @@ We are further developing the distributed version for a larger scale GNN model.
 
 ## Experiment Results
 We compared our model with STGCN, DCRNN, AGCRN, WGN, Dysat, TGAT, GWN and CLCRN. The reslut shows that our model outperform others especially in temperature prediction
-![image](https://github.com/xzwbsz/DCPGRNcode/assets/44642002/9b759d4f-cb70-4743-90d0-a8b630f03210)
+![image](https://github.com/xzwbsz/DCPGRNcode/assets/44642002/38b6df9f-aa75-4e90-9f27-8bc514bd7456)
+
 
 
 ## Acknowledgement
